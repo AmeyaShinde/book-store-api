@@ -1,4 +1,5 @@
-﻿using BookStore.API.Repository;
+﻿using BookStore.API.Models;
+using BookStore.API.Repository;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -21,6 +22,26 @@ namespace BookStore.API.Controllers
             var books = await _bookRepository.GetAllBooksAsync();
 
             return Ok(books);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetBookById([FromRoute] int id)
+        {
+            var book = await _bookRepository.GetBookByIdAsync(id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(book);
+        }
+
+        [HttpPost("")]
+        public async Task<IActionResult> AddNewBook([FromBody] BookModel bookModel)
+        {
+            var bookId = await _bookRepository.AddBookAsync(bookModel);
+
+            return CreatedAtAction(nameof(GetBookById), new { id = bookId, controller = "Books" }, bookId);
         }
     }
 }
